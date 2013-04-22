@@ -54,6 +54,10 @@ class HuffmanSuite extends FunSuite {
     }  
   }
   
+  test("times: nil") {
+    assert(times(Nil) === List())
+  }
+  
   test("string2chars(\"hello, world\")") {
     assert(string2Chars("hello, world") === List('h', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd'))
   }
@@ -89,5 +93,13 @@ class HuffmanSuite extends FunSuite {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
     }
+  }
+  
+  test("quickEncode: encode then decode gives identity") {
+    val text = string2Chars("Will this work on the first try? No. Got the reversed text as a result ;-)")
+    val codeTree = createCodeTree(text)
+    val encodedText = quickEncode(codeTree)(text)
+    val decodedText = decode(codeTree, encodedText)
+    assert(decodedText === text)
   }
 }
