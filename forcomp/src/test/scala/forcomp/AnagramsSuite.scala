@@ -18,19 +18,13 @@ class AnagramsSuite extends FunSuite {
     assert(wordOccurrences("Robert") === List(('b', 1), ('e', 1), ('o', 1), ('r', 2), ('t', 1)))
   }
 
-
-
   test("sentenceOccurrences: abcd e") {
     assert(sentenceOccurrences(List("abcd", "e")) === List(('a', 1), ('b', 1), ('c', 1), ('d', 1), ('e', 1)))
   }
 
-
-
   test("dictionaryByOccurrences.get: eat") {
     assert(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))).map(_.toSet) === Some(Set("ate", "eat", "tea")))
   }
-
-
 
   test("word anagrams: married") {
     assert(wordAnagrams("married").toSet === Set("married", "admirer"))
@@ -40,8 +34,20 @@ class AnagramsSuite extends FunSuite {
     assert(wordAnagrams("player").toSet === Set("parley", "pearly", "player", "replay"))
   }
 
+  test("subtract: abc - abc") {
+    val a = List(('a', 3), ('b', 2), ('c', 1))
+    val b = List(('a', 1), ('b', 1), ('c', 1))
+    val result = List(('a', 2), ('b', 1))
+    assert(subtract(a, b) === result)
+  }
 
-
+  test("subtract: ab - a") {
+    val a = List(('a', 3), ('b', 2))
+    val b = List(('a', 2))
+    val result = List(('a', 1), ('b', 2))
+    assert(subtract(a, b) === result)
+  }
+  
   test("subtract: lard - r") {
     val lard = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
     val r = List(('r', 1))
@@ -49,12 +55,30 @@ class AnagramsSuite extends FunSuite {
     assert(subtract(lard, r) === lad)
   }
 
-
-
   test("combinations: []") {
     assert(combinations(Nil) === List(Nil))
   }
 
+  test("combinations: x") {
+    val x = List(('x', 1))
+    val xCombinations = List(
+      List(),
+      List(('x', 1))
+    )
+    assert(combinations(x).toSet === xCombinations.toSet)
+  }
+  
+  test("combinations: xxx") {
+    val xxx = List(('x', 3))
+    val xxxCombinations = List(
+      List(),
+      List(('x', 1)),
+      List(('x', 2)),
+      List(('x', 3))
+    )
+    assert(combinations(xxx).toSet === xxxCombinations.toSet)
+  }
+  
   test("combinations: abba") {
     val abba = List(('a', 2), ('b', 2))
     val abbacomb = List(

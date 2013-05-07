@@ -36,10 +36,12 @@ object Anagrams {
   def wordOccurrences(w: Word): Occurrences = {
     val word = w.toLowerCase
     val charGroups = word groupBy (char => char)
-    val occurences = (charGroups mapValues (charGroup => charGroup.size)).toList
-    occurences sortWith (_._1 < _._1)
+    toOccurrences((charGroups mapValues (charGroup => charGroup.size)).toList)
   }
 
+  private def toOccurrences(list: List[(Char, Int)]): Occurrences = 
+    list sortWith (_._1 < _._1)
+  
   /** Converts a sentence into its character occurrence list. */
   def sentenceOccurrences(s: Sentence): Occurrences = {
     wordOccurrences(s.mkString)
@@ -91,10 +93,14 @@ object Anagrams {
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = {
     def foo(occurrences: Occurrences): List[Occurrences] = occurrences match {
-      case Nil => List()
-      case _ => for {
-        
-      } yield 
+      case Nil => List(List())
+      case (char, count) :: xs => 
+        val comb = foo(xs)
+        val n = for {
+            occ <- comb
+            i <- 1 to count
+        } yield (char, i) :: occ
+        comb ++ n
     }
     foo(occurrences)
   }
@@ -109,7 +115,14 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    val diffs = y.foldLeft(x.toMap)((map, occurence) => {
+      val (char, count) = occurence
+      val diff = map(char) - count
+      if (diff > 0) map updated (char, diff) else map - char
+    })
+    toOccurrences(diffs.toList)
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *  
