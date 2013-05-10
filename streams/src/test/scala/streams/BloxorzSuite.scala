@@ -53,13 +53,63 @@ class BloxorzSuite extends FunSuite {
       assert(terrain(Pos(3,7)), "3,7")
     }
   }
-
+  
   test("findChar level 1") {
     new Level1 {
       assert(startPos == Pos(1,1))
     }
   }
 
+  test("neighbors of startBlock") {
+    new Level1() {
+      val neighbors = startBlock.neighbors
+      assert(neighbors.size === 4)
+      assert(neighbors.contains((Block(Pos(-1, 1), Pos(0, 1)), Up)))
+      assert(neighbors.contains((Block(Pos(1, 2), Pos(1, 3)), Right)))
+      assert(neighbors.contains((Block(Pos(2, 1), Pos(3, 1)), Down)))
+      assert(neighbors.contains((Block(Pos(1, -1), Pos(1, 0)), Left)))
+    }
+  }
+  
+  test("legalNeighbors of startBlock") {
+    new Level1() {
+      val legalNeighbors = startBlock.legalNeighbors
+      assert(legalNeighbors.size === 2)
+      assert(legalNeighbors.contains((Block(Pos(1, 2), Pos(1, 3)), Right)))
+      assert(legalNeighbors.contains((Block(Pos(2, 1), Pos(3, 1)), Down)))
+    }
+  }
+  
+  test("done") {
+    new Level1() {
+      assert(! done(Block(Pos(4, 7), Pos(4, 8))))
+      assert(! done(Block(Pos(4, 6), Pos(4, 7))))
+      assert(done(Block(goal, goal)))
+    }
+  }
+  
+  test("neighborsWithHistory") {
+    new Level1() {
+      val result = neighborsWithHistory(Block(Pos(1, 1), Pos(1, 1)), List(Left, Up))
+      assert(result.size === 2)
+      assert(result contains (Block(Pos(1, 2), Pos(1, 3)), List(Right, Left, Up)))
+      assert(result contains (Block(Pos(2, 1), Pos(3, 1)), List(Down, Left, Up)))
+    }
+  }
+  
+  test("newNeighborsOnly") {
+    new Level1() {
+      val neighbors = newNeighborsOnly(
+        Set(
+          (Block(Pos(1, 2), Pos(1, 3)), List(Right, Left, Up)),
+          (Block(Pos(2, 1), Pos(3, 1)), List(Down, Left, Up))
+        ).toStream,
+        Set(Block(Pos(1, 2), Pos(1, 3)), Block(Pos(1, 1), Pos(1, 1)))
+      )
+      assert(neighbors === Set((Block(Pos(2, 1), Pos(3, 1)), List(Down, Left, Up))).toStream)
+    }
+  }
+  
   test("optimal solution for level 1") {
     new Level1 {
       assert(solve(solution) == Block(goal, goal))
@@ -68,6 +118,19 @@ class BloxorzSuite extends FunSuite {
 
   test("optimal solution length for level 1") {
     new Level1 {
+      assert(solution.length == optsolution.length)
+    }
+  }
+  
+  trait LevelWithoutSolution extends SolutionChecker {
+
+    val level = "ST"
+
+    val optsolution = List.empty
+  }
+  
+  test("solution length for level without solution") {
+    new LevelWithoutSolution() {
       assert(solution.length == optsolution.length)
     }
   }
