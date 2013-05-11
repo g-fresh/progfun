@@ -43,7 +43,11 @@ trait Solver extends GameDef {
    */
   def newNeighborsOnly(neighbors: Stream[(Block, List[Move])],
                        explored: Set[Block]): Stream[(Block, List[Move])] = {
-    neighbors filterNot (neighbor => explored.contains(neighbor._1))
+    def alreadyExplored(neighbor: (Block, List[Move])): Boolean = {
+      val (block, history) = neighbor
+      explored contains block
+    }
+    neighbors filterNot alreadyExplored
   }
              
 
